@@ -94,6 +94,41 @@
     <axis xyz="0 1 0"/>
     <dynamics damping="0.7"/>
   </joint>
+  <!-- mimic Link -->
+    <joint name="joint1_mimic" type="continuous">
+    <parent link="link1"/>
+    <child link="link2_mimic"/>
+    <origin xyz="0.2 ${width} ${height1 - axel_offset}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <mimic joint="joint1" multiplier="1.0" offset="0.0" />
+  </joint>
+
+  <link name="link2_mimic">
+    <collision>
+      <origin xyz="0 0 ${height2/2 - axel_offset}" rpy="0 0 0"/>
+      <geometry>
+  <box size="${width} ${width} ${height2}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 ${height2/2 - axel_offset}" rpy="0 0 0"/>
+      <geometry>
+  <box size="${width} ${width} ${height2}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 ${height2/2 - axel_offset}" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+    ixx="${mass / 12.0 * (width*width + height2*height2)}" ixy="0.0" ixz="0.0"
+    iyy="${mass / 12.0 * (height2*height2 + width*width)}" iyz="0.0"
+    izz="${mass / 12.0 * (width*width + width*width)}"/>
+    </inertial>
+  </link>
+
 
   <!-- Top Link -->
   <link name="link3">
@@ -217,5 +252,14 @@
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
+
+
+  <gazebo>
+    <plugin name="mimic_plugin" filename="libgazebo_mimic_plugin.so">
+      <joint>joint1</joint>
+      <mimicJoint>joint1_mimic</mimicJoint>
+      <multiplier>1.0</multiplier>
+    </plugin>
+  </gazebo>
 
 </robot>
