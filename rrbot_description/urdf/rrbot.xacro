@@ -6,9 +6,9 @@
   <xacro:property name="PI" value="3.1415926535897931"/>
   <xacro:property name="mass" value="1" /> <!-- arbitrary value for mass -->
   <xacro:property name="width" value="0.1" /> <!-- Square dimensions (widthxwidth) of beams -->
-  <xacro:property name="height1" value="2" /> <!-- Link 1 -->
-  <xacro:property name="height2" value="1" /> <!-- Link 2 -->
-  <xacro:property name="height3" value="1" /> <!-- Link 3 -->
+  <xacro:property name="height1" value="2.3" /> <!-- Link 1 -->
+  <xacro:property name="height2" value="2" /> <!-- Link 2 -->
+  <xacro:property name="height3" value="2" /> <!-- Link 3 -->
   <xacro:property name="camera_link" value="0.05" /> <!-- Size of square 'camera' box -->
   <xacro:property name="axel_offset" value="0.05" /> <!-- Space btw top of beam and the each joint -->
 
@@ -87,18 +87,18 @@
     </inertial>
   </link>
 
-  <joint name="joint2" type="continuous">
+<!--   <joint name="joint2" type="continuous">
     <parent link="link2"/>
     <child link="link3"/>
     <origin xyz="0 ${width} ${height2 - axel_offset*2}" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
     <dynamics damping="0.7"/>
-  </joint>
+  </joint> -->
   <!-- mimic Link -->
-    <joint name="joint1_mimic" type="continuous">
+  <joint name="joint1_mimic" type="continuous">
     <parent link="link1"/>
     <child link="link2_mimic"/>
-    <origin xyz="0.2 ${width} ${height1 - axel_offset}" rpy="0 0 0"/>
+    <origin xyz="0.5 ${width} ${height1 - axel_offset}" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
     <mimic joint="joint1" multiplier="1.0" offset="0.0" />
   </joint>
@@ -127,11 +127,12 @@
     iyy="${mass / 12.0 * (height2*height2 + width*width)}" iyz="0.0"
     izz="${mass / 12.0 * (width*width + width*width)}"/>
     </inertial>
+
   </link>
 
 
   <!-- Top Link -->
-  <link name="link3">
+<!--   <link name="link3">
     <collision>
       <origin xyz="0 0 ${height3/2 - axel_offset}" rpy="0 0 0"/>
       <geometry>
@@ -151,21 +152,21 @@
       <origin xyz="0 0 ${height3/2 - axel_offset}" rpy="0 0 0"/>
       <mass value="${mass}"/>
       <inertia
-	  ixx="${mass / 12.0 * (width*width + height3*height3)}" ixy="0.0" ixz="0.0"
-	  iyy="${mass / 12.0 * (height3*height3 + width*width)}" iyz="0.0"
-	  izz="${mass / 12.0 * (width*width + width*width)}"/>
+    	  ixx="${mass / 12.0 * (width*width + height3*height3)}" ixy="0.0" ixz="0.0"
+    	  iyy="${mass / 12.0 * (height3*height3 + width*width)}" iyz="0.0"
+    	  izz="${mass / 12.0 * (width*width + width*width)}"/>
     </inertial>
-  </link>
+  </link> -->
 
-  <joint name="hokuyo_joint" type="fixed">
+<!--   <joint name="hokuyo_joint" type="fixed">
     <axis xyz="0 1 0" />
     <origin xyz="0 0 ${height3 - axel_offset/2}" rpy="0 0 0"/>
     <parent link="link3"/>
     <child link="hokuyo_link"/>
-  </joint>
+  </joint> -->
 
   <!-- Hokuyo Laser -->
-  <link name="hokuyo_link">
+<!--   <link name="hokuyo_link">
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -192,21 +193,21 @@
     <origin xyz="${camera_link} 0 ${height3 - axel_offset*2}" rpy="0 0 0"/>
     <parent link="link3"/>
     <child link="camera_link"/>
-  </joint>
+  </joint> -->
 
   <!-- Camera -->
-  <link name="camera_link">
+<!--   <link name="camera_link">
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-	<box size="${camera_link} ${camera_link} ${camera_link}"/>
+        <box size="${camera_link} ${camera_link} ${camera_link}"/>
       </geometry>
     </collision>
 
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-	<box size="${camera_link} ${camera_link} ${camera_link}"/>
+        <box size="${camera_link} ${camera_link} ${camera_link}"/>
       </geometry>
       <material name="red"/>
     </visual>
@@ -216,20 +217,20 @@
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
     </inertial>
-  </link>
+  </link> -->
 
   <!-- generate an optical frame http://www.ros.org/reps/rep-0103.html#suffix-frames
       so that ros and opencv can operate on the camera frame correctly -->
-  <joint name="camera_optical_joint" type="fixed">
+<!--   <joint name="camera_optical_joint" type="fixed"> -->
     <!-- these values have to be these values otherwise the gazebo camera image
         won't be aligned properly with the frame it is supposedly originating from -->
-    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+<!--     <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
     <parent link="camera_link"/>
     <child link="camera_link_optical"/>
   </joint>
 
   <link name="camera_link_optical">
-  </link>
+  </link> -->
 
   <transmission name="tran1">
     <type>transmission_interface/SimpleTransmission</type>
@@ -242,7 +243,18 @@
     </actuator>
   </transmission>
 
-  <transmission name="tran2">
+<!--   <transmission name="tran1_mimic">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint1_mimic">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor1_mimic">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission> -->
+
+<!--   <transmission name="tran2">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="joint2">
       <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
@@ -251,15 +263,44 @@
       <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
-  </transmission>
+  </transmission> -->
 
 
   <gazebo>
     <plugin name="mimic_plugin" filename="libgazebo_mimic_plugin.so">
       <joint>joint1</joint>
       <mimicJoint>joint1_mimic</mimicJoint>
+      <link>link2</link>
+      <mimicLink>link2_mimic</mimicLink>
+      <parentLink>link1</parentLink>
       <multiplier>1.0</multiplier>
     </plugin>
+  </gazebo>
+
+  <gazebo reference="link2">
+    <kp>100000.0</kp>
+    <kd>0.0</kd>
+    <mu1>10.0</mu1>
+    <!-- <mu2>10.0</mu2> -->
+    <!-- <fdir1>1 1 0</fdir1> -->
+    <maxVel>10.0</maxVel>
+    <minDepth>0.0001</minDepth>
+    <maxContacts>5</maxContacts>
+    <!-- <dampingFactor>0.0</dampingFactor> -->
+    <selfCollide>true</selfCollide>
+  </gazebo>
+
+  <gazebo reference="link2_mimic">
+    <kp>100000.0</kp>
+    <kd>0.0</kd>
+    <mu1>0.0</mu1>
+    <!-- <mu2>10.0</mu2> -->
+    <!-- <fdir1>1 1 0</fdir1> -->
+    <maxVel>10.0</maxVel>
+    <minDepth>0.0001</minDepth>
+    <maxContacts>5</maxContacts>
+    <!-- <dampingFactor>0.0</dampingFactor> -->
+    <selfCollide>true</selfCollide>
   </gazebo>
 
 </robot>
